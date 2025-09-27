@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Utility tweaks */
+html, body { 
+  min-height: 100vh; 
+  background-color: #111827; /* gray-900 */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+.message-container { height: calc(100vh - 160px); }
+button[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* 确保右侧面板正确滚动 */
+.tweets-panel {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.tweets-content {
+  max-height: calc(100vh - 300px); /* 减去头部高度 */
+  overflow-y: auto;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
