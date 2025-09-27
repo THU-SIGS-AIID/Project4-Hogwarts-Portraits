@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { avatarImage, pinterestImages } from '../data/images'
+import { getExpressionByScore, getDefaultExpression } from '../utils/expressionManager'
 
 // 图片弹窗组件
 function ImageModal({ image, isOpen, onClose, onPrev, onNext }) {
@@ -181,9 +182,16 @@ function PinterestGrid({ images, onImageClick }) {
 }
 
 // 主要的头像 + 瀑布流面板
-export default function ImagePanel() {
+export default function ImagePanel({ expressionScore = 5 }) {
   const [selectedImage, setSelectedImage] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [currentExpression, setCurrentExpression] = useState(getDefaultExpression())
+
+  // 监听表情分数变化
+  useEffect(() => {
+    const newExpression = getExpressionByScore(expressionScore)
+    setCurrentExpression(newExpression)
+  }, [expressionScore])
 
   const handleImageClick = (image) => {
     setSelectedImage(image)
@@ -214,13 +222,18 @@ export default function ImagePanel() {
       {/* 头像区域 */}
       <div className="flex-shrink-0 p-8 flex items-center justify-center border-b border-gray-700 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="relative">
-          {/* 头像主体 */}
+          {/* 头像主体 - 动态表情 */}
           <div className="w-48 h-48 rounded-2xl overflow-hidden bg-gray-800 border-4 border-gray-600 shadow-2xl ring-4 ring-gray-700/50">
             <img
-              src={avatarImage}
-              alt="User Avatar"
+              src={currentExpression}
+              alt="Elon Musk Expression"
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
             />
+          </div>
+          
+          {/* 表情分数指示器 */}
+          <div className="absolute -top-2 -left-2 w-8 h-8 bg-blue-500 rounded-full border-4 border-gray-900 shadow-lg flex items-center justify-center">
+            <span className="text-white text-xs font-bold">{expressionScore}</span>
           </div>
           
           {/* 在线状态指示器 */}

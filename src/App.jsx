@@ -4,15 +4,18 @@ import ImagePanel from './components/ImagePanel'
 import TweetsPanel from './components/TweetsPanel'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { initialTweets, muskProfile } from './data/musk'
+import { sendChatMessage, validateApiConfig } from './services/difyApi'
 
 export default function App() {
   const [messages, setMessages] = useState([
-    { side: 'right', text: 'Hello, I need some help.' },
-    { side: 'left', text: 'Hello! I\'m an AI assistant, happy to help you! What can I do for you?' },
+    { side: 'right', text: 'Hey Elon! What are you working on today?' },
+    { side: 'left', text: 'Hey there! Just wrapped up a Starship meeting. We\'re making incredible progress on the next launch. Always exciting to push the boundaries of what\'s possible! What\'s on your mind?' },
   ])
 
   const [tweets, setTweets] = useLocalStorage('musk.tweets', initialTweets)
   const [activeTab, setActiveTab] = useLocalStorage('musk.activeTab', 'Posts')
+  const [expressionScore, setExpressionScore] = useState(5)
+  const [isLoading, setIsLoading] = useState(false)
   
   // 一次性迁移：确保 commentCount 与 comments.length 一致（修复旧本地缓存）
   useEffect(() => {
@@ -48,20 +51,69 @@ export default function App() {
   const [isDragging, setIsDragging] = useState(null)
   const containerRef = useRef(null)
 
-  const handleSend = (text) => {
-    // append chat (right)
+  const handleSend = async (text) => {
+    if (isLoading) return
+    
+    // 检查 API 配置
+    if (!validateApiConfig()) {
+      alert('Please configure VITE_DIFY_API_KEY and VITE_DIFY_BASE_URL in the .env file')
+      return
+    }
+    
+    // 添加用户消息
     setMessages(prev => [...prev, { side: 'right', text }])
-    // simple auto response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { side: 'left', text: 'Got it! I\'ll post this message to the Twitter feed on the right.' }])
-    }, 300)
-
-    // add to tweets (Posts) — 新发推文不再自动预置评论
-    setTweets(prev => [
-      { id: Date.now(), text, likes: 0, liked: false, time: 'now', category: 'Posts' },
-      ...prev,
-    ])
-    setActiveTab('Posts')
+    setIsLoading(true)
+    
+    try {
+      // 调用 Dify API
+      const result = await sendChatMessage(text)
+      
+      if (result.success && result.data) {
+        const { elon_chat, elon_x, elon_score } = result.data
+        
+        // 添加 AI 回复到聊天
+        if (elon_chat) {
+          setMessages(prev => [...prev, { side: 'left', text: elon_chat }])
+        }
+        
+        // 更新表情分数
+        if (typeof elon_score === 'number' && elon_score >= 0 && elon_score <= 10) {
+          setExpressionScore(elon_score)
+        }
+        
+        // 发推特（如果内容不为空且长度大于8个字符）
+        if (elon_x && typeof elon_x === 'string' && elon_x.length > 8) {
+          setTweets(prev => [
+            {
+              id: Date.now(),
+              text: elon_x,
+              likes: 0,
+              liked: false,
+              time: 'now',
+              category: 'Posts',
+              commentCount: 0,
+              comments: []
+            },
+            ...prev,
+          ])
+          setActiveTab('Posts')
+        }
+      } else {
+        // API 调用失败，显示错误消息
+        setMessages(prev => [...prev, { 
+          side: 'left', 
+          text: result.data?.elon_chat || 'Sorry, I cannot respond right now. Please try again later.' 
+        }])
+      }
+    } catch (error) {
+      console.error('Send message failed:', error)
+      setMessages(prev => [...prev, { 
+        side: 'left', 
+        text: 'Sorry, there was a system error. Please try again later.' 
+      }])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const toggleLike = (id) => {
@@ -111,7 +163,7 @@ export default function App() {
     <div ref={containerRef} className="flex h-screen bg-gray-900 text-white relative overflow-hidden">
       {/* 左侧面板 */}
       <div className="min-w-0" style={{ width: `${leftWidth}%` }}>
-        <ChatPanel messages={messages} onSend={handleSend} />
+        <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} />
       </div>
       
       {/* 左侧拖拽条 */}
@@ -122,7 +174,7 @@ export default function App() {
       
       {/* 中间面板 */}
       <div className="min-w-0" style={{ width: `${middleWidth}%` }}>
-        <ImagePanel />
+        <ImagePanel expressionScore={expressionScore} />
       </div>
       
       {/* 右侧拖拽条 */}
