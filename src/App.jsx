@@ -56,7 +56,7 @@ export default function App() {
     
     // 检查 API 配置
     if (!validateApiConfig()) {
-      alert('Please configure VITE_DIFY_API_KEY and VITE_DIFY_BASE_URL in the .env file')
+      alert('Please configure Dify API settings:\n\n1. Click the settings icon (⚙️) in the chat panel, or\n2. Set VITE_DIFY_API_KEY and VITE_DIFY_BASE_URL in environment variables or .env file')
       return
     }
     

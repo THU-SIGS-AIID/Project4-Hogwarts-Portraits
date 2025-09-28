@@ -316,7 +316,7 @@ function CommentModal({ tweet, isOpen, onClose, profile, onUpdateComments }) {
 
 const TABS = ['Posts', 'Replies', 'Subs', 'Highlights', 'Media']
 
-function MuskHeader({ profile }) {
+function MuskHeader({ profile, onSubscribeClick, subscribeEffect, emojiEffect }) {
   return (
     <>
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -350,7 +350,7 @@ function MuskHeader({ profile }) {
 
       <div className="p-4 flex justify-end relative">
         <button 
-          onClick={handleSubscribeClick}
+          onClick={onSubscribeClick}
           className={`rounded-[4px] bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 whitespace-nowrap font-bold transition-all duration-300 relative overflow-hidden ${
             subscribeEffect ? 'animate-pulse shadow-lg shadow-blue-500/50 bg-blue-600' : ''
           }`}
@@ -455,7 +455,12 @@ export default function TweetsPanel({ profile, tweets, onToggleLike, activeTab, 
     <div className="w-full h-screen bg-gray-900 text-white overflow-y-auto min-w-0">
       {/* 整个面板都可以滚动 */}
       <div className="min-h-full">
-        <MuskHeader profile={profile} />
+        <MuskHeader 
+          profile={profile} 
+          onSubscribeClick={handleSubscribeClick}
+          subscribeEffect={subscribeEffect}
+          emojiEffect={emojiEffect}
+        />
 
         {/* 可滚动的标签栏 */}
         <div className="sticky top-0 bg-gray-900 z-10 flex border-b border-gray-700 font-bold overflow-x-auto scrollbar-hide">

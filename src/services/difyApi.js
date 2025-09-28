@@ -12,19 +12,38 @@
  * @returns {Object} API 配置对象
  */
 function getApiConfig() {
-  // Vite 会自动从以下来源读取环境变量（按优先级）：
-  // 1. 系统环境变量
-  // 2. .env.local 文件
-  // 3. .env.[mode] 文件
-  // 4. .env 文件
+  // 优先级顺序：
+  // 1. localStorage 中的用户设置（最高优先级）
+  // 2. 动态设置的 window 变量
+  // 3. 系统环境变量
+  // 4. .env.local 文件
+  // 5. .env.[mode] 文件
+  // 6. .env 文件
   
-  const API_KEY = import.meta.env.VITE_DIFY_API_KEY
-  const BASE_URL = import.meta.env.VITE_DIFY_BASE_URL || 'https://api.dify.ai/v1/chat-messages'
+  // 从 localStorage 获取用户设置
+  const localApiKey = typeof window !== 'undefined' ? localStorage.getItem('dify_api_key') : null
+  const localBaseUrl = typeof window !== 'undefined' ? localStorage.getItem('dify_base_url') : null
+  
+  // 从动态 window 变量获取
+  const windowApiKey = typeof window !== 'undefined' ? window.VITE_DIFY_API_KEY : null
+  const windowBaseUrl = typeof window !== 'undefined' ? window.VITE_DIFY_BASE_URL : null
+  
+  // 从环境变量获取
+  const envApiKey = import.meta.env.VITE_DIFY_API_KEY
+  const envBaseUrl = import.meta.env.VITE_DIFY_BASE_URL
+  
+  // 按优先级选择配置
+  const API_KEY = localApiKey || windowApiKey || envApiKey
+  const BASE_URL = localBaseUrl || windowBaseUrl || envBaseUrl || 'https://api.dify.ai/v1/chat-messages'
   
   return {
     API_KEY,
     BASE_URL,
-    isValid: !!(API_KEY && BASE_URL)
+    isValid: !!(API_KEY && BASE_URL),
+    source: {
+      apiKey: localApiKey ? 'localStorage' : (windowApiKey ? 'window' : (envApiKey ? 'env' : 'none')),
+      baseUrl: localBaseUrl ? 'localStorage' : (windowBaseUrl ? 'window' : (envBaseUrl ? 'env' : 'default'))
+    }
   }
 }
 
