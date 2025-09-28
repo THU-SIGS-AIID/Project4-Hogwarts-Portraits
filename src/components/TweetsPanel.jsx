@@ -348,8 +348,27 @@ function MuskHeader({ profile }) {
         <div className="h-16" />
       </div>
 
-      <div className="p-4 flex justify-end">
-        <button className="rounded-[4px] bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 whitespace-nowrap font-bold">Subscribe</button>
+      <div className="p-4 flex justify-end relative">
+        <button 
+          onClick={handleSubscribeClick}
+          className={`rounded-[4px] bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 whitespace-nowrap font-bold transition-all duration-300 relative overflow-hidden ${
+            subscribeEffect ? 'animate-pulse shadow-lg shadow-blue-500/50 bg-blue-600' : ''
+          }`}
+        >
+          Subscribe
+          {subscribeEffect && (
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-30 animate-ping"></div>
+          )}
+        </button>
+        
+        {/* 笑脸弹出特效 */}
+        {emojiEffect && (
+          <div className="absolute top-0 right-0 pointer-events-none">
+            <div className="animate-bounce text-4xl">😊</div>
+            <div className="animate-ping absolute top-2 right-2 text-2xl">✨</div>
+            <div className="animate-pulse absolute top-1 right-8 text-xl">💖</div>
+          </div>
+        )}
       </div>
 
       <div className="px-4 mb-4">
@@ -402,6 +421,8 @@ export default function TweetsPanel({ profile, tweets, onToggleLike, activeTab, 
   const filtered = useMemo(() => tweets.filter(t => t.category === activeTab), [tweets, activeTab])
   const [selectedTweet, setSelectedTweet] = useState(null)
   const [commentModalOpen, setCommentModalOpen] = useState(false)
+  const [subscribeEffect, setSubscribeEffect] = useState(false)
+  const [emojiEffect, setEmojiEffect] = useState(false)
 
   const handleTweetClick = (tweet) => {
     setSelectedTweet(tweet)
@@ -411,6 +432,23 @@ export default function TweetsPanel({ profile, tweets, onToggleLike, activeTab, 
   const closeCommentModal = () => {
     setCommentModalOpen(false)
     setSelectedTweet(null)
+  }
+
+  const handleSubscribeClick = () => {
+    // 触发发光特效
+    setSubscribeEffect(true)
+    
+    // 触发笑脸弹出特效
+    setEmojiEffect(true)
+    
+    // 重置特效
+    setTimeout(() => {
+      setSubscribeEffect(false)
+    }, 600)
+    
+    setTimeout(() => {
+      setEmojiEffect(false)
+    }, 1500)
   }
 
   return (
@@ -436,7 +474,7 @@ export default function TweetsPanel({ profile, tweets, onToggleLike, activeTab, 
         <div className="pb-4">
           {activeTab === 'Subs' ? (
             // Subs 标签页显示订阅内容
-            <div className="p-8 text-center">
+            <div className="p-8 text-center relative">
               <div className="max-w-md mx-auto">
                 <h2 className="text-3xl font-bold text-white mb-6">
                   Unlock more with Subscriptions
@@ -444,10 +482,31 @@ export default function TweetsPanel({ profile, tweets, onToggleLike, activeTab, 
                 <p className="text-gray-400 text-lg mb-8">
                   @elonmusk has shared 11 Subscriber-only posts. Subscribe to see their exclusive posts and bonus content.
                 </p>
-                <button className="bg-white text-black font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-200 transition-colors">
+                <button 
+                  onClick={handleSubscribeClick}
+                  className={`bg-white text-black font-bold py-3 px-8 rounded-full text-lg transition-all duration-300 relative overflow-hidden ${
+                    subscribeEffect 
+                      ? 'animate-pulse shadow-2xl shadow-yellow-400/50 bg-gradient-to-r from-yellow-400 to-orange-500 text-white' 
+                      : 'hover:bg-gray-200'
+                  }`}
+                >
                   Subscribe
+                  {subscribeEffect && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 opacity-40 animate-ping"></div>
+                  )}
                 </button>
               </div>
+              
+              {/* 大型笑脸弹出特效 - 仅在 Subs 页面 */}
+              {emojiEffect && activeTab === 'Subs' && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="text-8xl animate-bounce">🎉</div>
+                  <div className="absolute top-1/3 left-1/3 text-6xl animate-ping">😄</div>
+                  <div className="absolute top-1/2 right-1/3 text-5xl animate-pulse">🌟</div>
+                  <div className="absolute bottom-1/3 left-1/2 text-4xl animate-bounce delay-150">💫</div>
+                  <div className="absolute top-1/4 right-1/4 text-3xl animate-spin">✨</div>
+                </div>
+              )}
             </div>
           ) : activeTab === 'Media' ? (
             <div className="p-2 sm:p-4">
