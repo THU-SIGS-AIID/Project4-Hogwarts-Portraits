@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // Vite config; react plugin is optional for JSX transform in dev tools
 export default defineConfig({
+  base: '/Project4-Hogwarts-Portraits/',
   plugins: [react()],
   server: {
     host: '0.0.0.0',
