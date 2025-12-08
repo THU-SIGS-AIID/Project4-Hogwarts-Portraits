@@ -382,11 +382,7 @@ function MuskHeader({ profile, onSubscribeClick, subscribeEffect, emojiEffect })
           </svg>
         </h1>
         <div className="text-gray-500">{profile.handle}</div>
-        {profile.website && (
-          <div className="mt-2">
-            <a href={`https://${profile.website}`} className="text-blue-400 hover:underline">{profile.website}</a>
-          </div>
-        )}
+
         <div className="flex items-center gap-4 mt-3 text-gray-500 text-sm">
           <div className="flex items-center gap-1">
             <i className="fas fa-calendar-alt" />
@@ -403,15 +399,7 @@ function MuskHeader({ profile, onSubscribeClick, subscribeEffect, emojiEffect })
             <span className="text-gray-500">Followers</span>
           </div>
         </div>
-        {profile.followedBy && (
-          <div className="mt-2 text-gray-500 text-sm flex items-center gap-1">
-            <div className="flex -space-x-1">
-              <div className="w-4 h-4 bg-gray-600 rounded-full border border-gray-900"></div>
-              <div className="w-4 h-4 bg-gray-600 rounded-full border border-gray-900"></div>
-            </div>
-            <span>{profile.followedBy}</span>
-          </div>
-        )}
+
       </div>
     </>
   )

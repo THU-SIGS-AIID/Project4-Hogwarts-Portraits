@@ -10,7 +10,6 @@ export const muskProfile = {
   following: '1,216',
   followers: '226.7M',
   bio: '',
-  website: 'votetesla.com',
   posts: '86.4K posts',
   followedBy: 'Followed by WaveSpeedAI, Kimi.ai, and 134 others you follow',
 }
